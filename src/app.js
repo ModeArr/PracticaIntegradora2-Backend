@@ -56,7 +56,7 @@ const io = require('socket.io')(server);
 
 initializePassport();
 app.use(passport.initialize());
-app.use(passport.session());
+//app.use(passport.session());
 
 app.engine("handlebars", handlebars.engine())
 app.set("views", path.join(`${__dirname}/views`))

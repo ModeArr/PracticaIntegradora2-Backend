@@ -15,7 +15,7 @@ class DBCartManager {
         try {
             const cart = await cartsModel.create({products: []})
             .then((res) => {
-                return `Se creo un nuevo carrito con id ${res._id}` 
+                return res._id 
             })
             .catch((error) => {
                 throw Error(error)

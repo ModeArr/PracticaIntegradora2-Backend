@@ -4,6 +4,11 @@ const GithubStrategy = require("passport-github2");
 const DBUserManager = require("../dao/DBUserManager");
 const userModel = require("../dao/models/user.models");
 const userManager = new DBUserManager()
+const jwt = require("passport-jwt");
+const { JWTSECRET } = require("../utils/jwt");
+
+const JWTStrategy = jwt.Strategy;
+const ExtractJWT = jwt.ExtractJwt;
 
 const GITHUB_CLIENT_ID = "04b186f6bf114610bee3"; 
 const GITHUB_CLIENT_SECRET = "e47a226def5d0dc2592c0ca4c9b0a3df8e681418";
@@ -20,7 +25,7 @@ const initializePassport = () => {
       },
       async (req, username, password, done) => {
 
-        const { first_name, last_name, email } = req.body;
+        const { first_name, last_name, age, email } = req.body;
 
         try {
           let user = await userManager.checkUser(email)
@@ -28,7 +33,7 @@ const initializePassport = () => {
             return done(null, false);
           }
 
-          const newUser = await userManager.addUser(first_name, last_name, email, password)
+          const newUser = await userManager.addUser(first_name, last_name, email, Number(age), password)
 
           if (!newUser) {
             return res
@@ -92,14 +97,23 @@ const initializePassport = () => {
     )
   );
 
-  passport.serializeUser((user, done) => {
-    done(null, user);
-  });
+  passport.use(
+    "jwt",
+    new JWTStrategy(
+      {
+        jwtFromRequest: ExtractJWT.fromAuthHeaderAsBearerToken(),
+        secretOrKey: JWTSECRET,
+      },
+      async (jwtPayload, done) => {
+        try {
+          return done(null, jwtPayload);
+        } catch (error) {
+          return done(error);
+        }
+      }
+    )
+  );
 
-  passport.deserializeUser(async (user, done) => {
-    //let user = await userManager.checkUserID(user._id);
-    done(null, user);
-  });
 };
 
 module.exports = initializePassport;

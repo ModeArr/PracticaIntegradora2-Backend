@@ -1,5 +1,7 @@
 const userModel = require('./models/user.models')
 const { isValidPasswd, createHash } = require("../utils/encrypt");
+const DBCartManager = require("../dao/DBCartManager");
+const cart = new DBCartManager()
 
 class DBUserManager {
 
@@ -20,7 +22,7 @@ class DBUserManager {
         }  
     }
 
-    async addUser(first_name, last_name, email, password) {
+    async addUser(first_name, last_name, email, age, password) {
         try {   
             if (!first_name.trim()){
                 throw new Error('Ingresa un Nombre correcto')
@@ -38,13 +40,19 @@ class DBUserManager {
                 throw new Error('Ingresa una contrasena')
             }
 
+            if (age <= 0  || typeof age != 'number') {
+                throw new Error('Ingresa una edad correcta')
+            }
+
             const pswHashed = await createHash(password)
     
             const user = {
                 first_name,
                 last_name,
                 email,
-                password: pswHashed
+                password: pswHashed,
+                age,
+                cart: await cart.addCart()
             }
 
             let result = await userModel.create(user).then((res) => {
