@@ -24,7 +24,7 @@ const userSchema = new mongoose.Schema({
 });
 
 userSchema.pre('findOne', function () {
-  this.populate('carts.cart')
+  this.populate('cart.carts')
 })
 
 const userModel = mongoose.model(collection, userSchema);

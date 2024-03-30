@@ -36,7 +36,7 @@ router.get('/', authMdw, (req, res) => {
             products: result.payload,
             nextPage: result.nextLink,
             prevPage: result.prevLink,
-            user: req.session.passport.user,
+            user: req.user,
             style: "styles.css"
         })
     }).catch(err => {
@@ -68,7 +68,7 @@ router.get('/realtimeproducts', authMdw, (req, res) => {
             products: result.payload,
             nextPage: result.nextLink,
             prevPage: result.prevLink,
-            user: req.session.passport.user
+            user: req.user
         })
     }).catch(err => {
         console.log(err);
@@ -112,7 +112,7 @@ router.get('/products', authMdw, (req, res) => {
             products: result.payload,
             nextPage: result.nextLink,
             prevPage: result.prevLink,
-            user: req.session.passport.user,
+            user: req.user,
             style: "styles.css"
         })
     }).catch(err => {

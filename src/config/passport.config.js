@@ -5,10 +5,9 @@ const DBUserManager = require("../dao/DBUserManager");
 const userModel = require("../dao/models/user.models");
 const userManager = new DBUserManager()
 const jwt = require("passport-jwt");
-const { JWTSECRET } = require("../utils/jwt");
 
 const JWTStrategy = jwt.Strategy;
-const ExtractJWT = jwt.ExtractJwt;
+const secret = "JWTSECRET"
 
 const GITHUB_CLIENT_ID = "04b186f6bf114610bee3"; 
 const GITHUB_CLIENT_SECRET = "e47a226def5d0dc2592c0ca4c9b0a3df8e681418";
@@ -58,7 +57,7 @@ const initializePassport = () => {
       async (username, password, done) => {
         try {
           let user = await userManager.checkUserAndPass(username, password)
-          console.log(user)
+
           return done(null, user);
         } catch (error) {
           return done(error);
@@ -97,22 +96,26 @@ const initializePassport = () => {
     )
   );
 
-  passport.use(
-    "jwt",
-    new JWTStrategy(
-      {
-        jwtFromRequest: ExtractJWT.fromAuthHeaderAsBearerToken(),
-        secretOrKey: JWTSECRET,
-      },
-      async (jwtPayload, done) => {
-        try {
-          return done(null, jwtPayload);
-        } catch (error) {
-          return done(error);
-        }
-      }
-    )
-  );
+  const cookieExtractor = req => {
+    let token = null 
+
+    if (req && req.cookies) {
+        token = req.cookies['jwt']
+    }
+
+    return token
+}
+
+passport.use('jwt', new JWTStrategy({
+  jwtFromRequest: cookieExtractor,
+  secretOrKey: secret
+}, async (jwtPayload, done) => {
+  try {
+    done(null, jwtPayload)
+  } catch (error) {
+    done(error)
+  }
+}))
 
 };
 

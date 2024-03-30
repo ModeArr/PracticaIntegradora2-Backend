@@ -16,7 +16,6 @@ const passport = require("passport")
 PORT = 8080
 API_PREFIX = "api"
 MONGO_URL = "mongodb+srv://Coder:u9TPQxlvOLPXpuKA@coder-backend.qtumzqc.mongodb.net/?retryWrites=true&w=majority"
-SECRET_SESSION = "secretSessionPassword"
 
 const app = express()
 
@@ -24,20 +23,6 @@ app.use(express.urlencoded({ extends: true }));
 app.use(express.json()); 
 app.use(express.static(__dirname + '/public'))
 app.use(cookieParser());
-app.use(
-  session({
-    store: mongoStore.create({
-      mongoUrl: MONGO_URL,
-      dbName: 'ecommerce',
-      collectionName: 'sessions',
-      mongoOptions: { useNewUrlParser: true, useUnifiedTopology: true },
-      ttl: 60 * 3600,
-    }),
-    secret: SECRET_SESSION,
-    resave: false,
-    saveUninitialized: false,
-  })
-);
 
 mongoose.connect(MONGO_URL, {
     dbName: 'ecommerce',
@@ -56,7 +41,6 @@ const io = require('socket.io')(server);
 
 initializePassport();
 app.use(passport.initialize());
-//app.use(passport.session());
 
 app.engine("handlebars", handlebars.engine())
 app.set("views", path.join(`${__dirname}/views`))
