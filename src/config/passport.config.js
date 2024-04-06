@@ -76,15 +76,18 @@ const initializePassport = () => {
       },
       async (accessToken, refreshToken, profile, done) => {
         try {
+          console.log(profile._json)
           let user = await userManager.checkUser(profile._json?.email);
           if (!user) {
             let addNewUser = {
               first_name: profile._json.name,
               last_name: "No LastName", //areglar esto
               email: profile._json?.email,
+              age: 18,
               password: "GenerarPassHasheadaRandom", //y esto
             };
-            let newUser = await userManager.addUser(addNewUser.first_name, addNewUser.last_name, addNewUser.email, addNewUser.password);
+            console.log(addNewUser)
+            let newUser = await userManager.addUser(addNewUser.first_name, addNewUser.last_name, addNewUser.email, addNewUser.age, addNewUser.password);
             done(null, newUser);
           } else {
             done(null, user);

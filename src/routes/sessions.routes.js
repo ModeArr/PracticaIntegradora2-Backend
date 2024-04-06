@@ -47,8 +47,19 @@ router.get(
   "/github/callback",
   passport.authenticate("github", { 
     failureRedirect: "/login",
-    successRedirect: '/',
-})
+    session: false,
+}), function(req, res) {
+  const token = jwt.sign(JSON.stringify(req.user), secret)
+  console.log(req.user)
+
+  res.cookie("jwt", token, {
+    httpOnly: true,
+    secure: false,
+    maxAge: 1000 * 60 * 30 // 30 min
+  })
+
+  res.redirect('/');
+}
 );
 
 router.get("/current", passport.authenticate("jwt", { session: false }),
